@@ -9,6 +9,9 @@ import {
   Clock,
   ArrowRight,
   Lock,
+  Printer,
+  Award,
+  FileCheck,
 } from 'lucide-react';
 import { QuickCountStats, ElectionSettings, User } from '../types';
 
@@ -18,6 +21,9 @@ interface HeroSectionProps {
   currentUser: User | null;
   onStartVoting: () => void;
   onViewQuickCount: () => void;
+  onViewBallot?: () => void;
+  onViewRecap?: () => void;
+  onViewReport?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -26,6 +32,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   currentUser,
   onStartVoting,
   onViewQuickCount,
+  onViewBallot,
+  onViewRecap,
+  onViewReport,
 }) => {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#061838] via-[#0A2660] to-[#14479E] text-white py-16 sm:py-24 lg:py-28 px-4 sm:px-6 lg:px-8">
@@ -88,6 +97,41 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <BarChart3 className="w-5 h-5 text-cyan-300" />
                 <span>Lihat Quick Count</span>
               </button>
+            </div>
+
+            {/* Official Documents Bar: Cetak Kartu Suara, Rekapitulasi, Berita Acara */}
+            <div className="flex flex-wrap items-center gap-2 pt-2">
+              <span className="text-xs font-semibold text-blue-200/90 mr-1">Dokumen Resmi:</span>
+              {onViewBallot && (
+                <button
+                  id="btn-hero-ballot"
+                  onClick={onViewBallot}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Cetak Kartu Suara</span>
+                </button>
+              )}
+              {onViewRecap && (
+                <button
+                  id="btn-hero-recap"
+                  onClick={onViewRecap}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
+                >
+                  <Award className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Rekapitulasi Hasil</span>
+                </button>
+              )}
+              {onViewReport && (
+                <button
+                  id="btn-hero-report"
+                  onClick={onViewReport}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
+                >
+                  <FileCheck className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Berita Acara</span>
+                </button>
+              )}
             </div>
 
             {/* Security Guarantee Badges */}

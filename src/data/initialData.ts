@@ -3,7 +3,7 @@ import { Candidate, ElectionSettings, User, Vote } from '../types';
 export const INITIAL_SETTINGS: ElectionSettings = {
   title: 'PEMILIHAN KETUA & WAKIL KETUA OSIS',
   school_name: 'SMA NEGERI 1 TELADAN',
-  period: 'Periode 2026 / 2027',
+  period: 'Periode 2026/2027',
   status: 'Sedang Berlangsung',
   start_date: '2026-09-12T07:00:00',
   end_date: '2026-09-13T16:00:00',
@@ -13,6 +13,18 @@ export const INITIAL_SETTINGS: ElectionSettings = {
     lng: 106.8456,
     radius_meters: 1000,
   },
+  school_logo: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=200&auto=format&fit=crop&q=80',
+  organization_name: 'Komisi Pemilihan Umum OSIS & MPK',
+  school_address: 'Jl. Pemuda Pendidikan No. 45, Kebayoran Baru',
+  school_city: 'Jakarta Selatan',
+  school_province: 'DKI Jakarta',
+  headmaster_name: 'Drs. H. Bambang Sudirman, M.Pd.',
+  headmaster_nip: '19750812 200003 1 002',
+  kpu_chairman: 'Muhammad Rian Pratama',
+  kpu_secretary: 'Anindya Larasati',
+  contact_email: 'kpu.osis@sman1teladan.sch.id',
+  contact_phone: '0812-3456-7890',
+  website_url: 'https://sman1teladan.sch.id',
 };
 
 export const INITIAL_CANDIDATES: Candidate[] = [

@@ -18,9 +18,18 @@ import {
   Database,
   AlertTriangle,
   Lock,
+  Building2,
+  Printer,
+  Award,
+  FileCheck,
+  FileText,
 } from 'lucide-react';
 import { Candidate, ElectionSettings, QuickCountStats, User, Vote } from '../types';
 import { exportToCSV, formatDateIndonesian } from '../lib/utils';
+import { InstitutionSettings } from './InstitutionSettings';
+import { PrintBallotCard } from './PrintBallotCard';
+import { RecapResults } from './RecapResults';
+import { OfficialReport } from './OfficialReport';
 import {
   resetAllVotes,
   resetToInitialData,
@@ -50,7 +59,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onRefresh,
   onOpenSupabaseModal,
 }) => {
-  const [adminTab, setAdminTab] = useState<'overview' | 'candidates' | 'voters' | 'settings'>('overview');
+  const [adminTab, setAdminTab] = useState<
+    | 'overview'
+    | 'recap'
+    | 'report'
+    | 'ballot'
+    | 'candidates'
+    | 'voters'
+    | 'institution'
+    | 'settings'
+  >('overview');
 
   // Candidate Editing State
   const [editingCandidate, setEditingCandidate] = useState<Candidate | null>(null);
@@ -292,21 +310,64 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* Global Admin Buttons */}
         <div className="flex flex-wrap items-center gap-2">
           <button
+            id="btn-admin-ballot-shortcut"
+            onClick={() => setAdminTab('ballot')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              adminTab === 'ballot'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-blue-50 dark:bg-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+            }`}
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Cetak Kartu Suara</span>
+          </button>
+
+          <button
+            id="btn-admin-recap-shortcut"
+            onClick={() => setAdminTab('recap')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              adminTab === 'recap'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'bg-amber-50 dark:bg-amber-950/70 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5" />
+            <span>Rekapitulasi Hasil</span>
+          </button>
+
+          <button
+            id="btn-admin-report-shortcut"
+            onClick={() => setAdminTab('report')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              adminTab === 'report'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+            }`}
+          >
+            <FileCheck className="w-3.5 h-3.5" />
+            <span>Berita Acara</span>
+          </button>
+
+          <button
+            id="btn-admin-institution-shortcut"
+            onClick={() => setAdminTab('institution')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              adminTab === 'institution'
+                ? 'bg-slate-700 text-white shadow-sm'
+                : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Seting Lembaga</span>
+          </button>
+
+          <button
             id="btn-admin-export-results"
             onClick={handleExportResults}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export Excel Hasil</span>
-          </button>
-
-          <button
-            id="btn-admin-supabase-config"
-            onClick={onOpenSupabaseModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
-          >
-            <Database className="w-3.5 h-3.5 text-blue-500" />
-            <span>Koneksi Supabase</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
@@ -314,20 +375,61 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Admin Subtabs */}
       <div className="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 text-xs sm:text-sm font-bold">
         <button
+          id="tab-admin-overview"
           onClick={() => setAdminTab('overview')}
-          className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all ${
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
             adminTab === 'overview'
               ? 'bg-indigo-600 text-white shadow-md'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <BarChart3 className="w-4 h-4" />
-          <span>Rekap &amp; Hasil</span>
+          <span>Quick Count Visual</span>
         </button>
 
         <button
+          id="tab-admin-ballot"
+          onClick={() => setAdminTab('ballot')}
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
+            adminTab === 'ballot'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Printer className="w-4 h-4" />
+          <span>Cetak Kartu Suara</span>
+        </button>
+
+        <button
+          id="tab-admin-recap"
+          onClick={() => setAdminTab('recap')}
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
+            adminTab === 'recap'
+              ? 'bg-amber-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Award className="w-4 h-4" />
+          <span>Rekapitulasi Hasil</span>
+        </button>
+
+        <button
+          id="tab-admin-report"
+          onClick={() => setAdminTab('report')}
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
+            adminTab === 'report'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <FileCheck className="w-4 h-4" />
+          <span>Berita Acara</span>
+        </button>
+
+        <button
+          id="tab-admin-candidates"
           onClick={() => setAdminTab('candidates')}
-          className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all ${
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
             adminTab === 'candidates'
               ? 'bg-indigo-600 text-white shadow-md'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -338,8 +440,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
+          id="tab-admin-voters"
           onClick={() => setAdminTab('voters')}
-          className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all ${
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
             adminTab === 'voters'
               ? 'bg-indigo-600 text-white shadow-md'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -350,8 +453,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
+          id="tab-admin-institution"
+          onClick={() => setAdminTab('institution')}
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
+            adminTab === 'institution'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Building2 className="w-4 h-4" />
+          <span>Seting Lembaga</span>
+        </button>
+
+        <button
+          id="tab-admin-settings"
           onClick={() => setAdminTab('settings')}
-          className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all ${
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
             adminTab === 'settings'
               ? 'bg-indigo-600 text-white shadow-md'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -877,7 +994,53 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       )}
 
-      {/* TAB 4: SETTINGS & DANGEROUS ACTIONS */}
+      {/* TAB: CETAK KARTU SUARA & SURAT SUARA */}
+      {adminTab === 'ballot' && (
+        <PrintBallotCard
+          candidates={candidates}
+          users={users}
+          settings={settings}
+          onBack={() => setAdminTab('overview')}
+        />
+      )}
+
+      {/* TAB: REKAPITULASI HASIL (MODEL C1) */}
+      {adminTab === 'recap' && (
+        <RecapResults
+          candidates={candidates}
+          users={users}
+          votes={votes}
+          settings={settings}
+          stats={stats}
+          onBack={() => setAdminTab('overview')}
+        />
+      )}
+
+      {/* TAB: MENU BERITA ACARA RESMI */}
+      {adminTab === 'report' && (
+        <OfficialReport
+          candidates={candidates}
+          users={users}
+          votes={votes}
+          settings={settings}
+          stats={stats}
+          onBack={() => setAdminTab('overview')}
+        />
+      )}
+
+      {/* TAB 4: INSTITUTION SETTINGS (SETING LEMBAGA) */}
+      {adminTab === 'institution' && (
+        <InstitutionSettings
+          settings={settings}
+          onSave={(updated) => {
+            saveSettings(updated);
+            showToast('Seting lembaga berhasil diperbarui!');
+            onRefresh();
+          }}
+        />
+      )}
+
+      {/* TAB 5: SETTINGS & DANGEROUS ACTIONS */}
       {adminTab === 'settings' && (
         <div className="space-y-6">
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">

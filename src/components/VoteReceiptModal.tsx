@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { CheckCircle2, ShieldCheck, Download, BarChart3, QrCode, X, Calendar } from 'lucide-react';
-import { Candidate, User, Vote } from '../types';
+import { Candidate, ElectionSettings, User, Vote } from '../types';
 import { formatDateIndonesian } from '../lib/utils';
 
 interface VoteReceiptModalProps {
@@ -10,6 +10,7 @@ interface VoteReceiptModalProps {
   user: User | null;
   onClose: () => void;
   onViewQuickCount: () => void;
+  settings?: ElectionSettings;
 }
 
 export const VoteReceiptModal: React.FC<VoteReceiptModalProps> = ({
@@ -18,6 +19,7 @@ export const VoteReceiptModal: React.FC<VoteReceiptModalProps> = ({
   user,
   onClose,
   onViewQuickCount,
+  settings,
 }) => {
   useEffect(() => {
     // Trigger celebratory confetti
@@ -75,7 +77,7 @@ export const VoteReceiptModal: React.FC<VoteReceiptModalProps> = ({
                 Tanda Terima Digital Resmi
               </span>
               <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                KPU OSIS SMA Negeri 1 Teladan
+                {settings?.organization_name || 'KPU OSIS'} • {settings?.school_name || 'SMA Negeri 1 Teladan'}
               </h4>
             </div>
             <div className="p-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600">

@@ -46,6 +46,19 @@ export interface ElectionSettings {
     lng: number;
     radius_meters: number;
   };
+  // Setting Lembaga (Institution Settings)
+  school_logo?: string;
+  organization_name?: string;
+  school_address?: string;
+  school_city?: string;
+  school_province?: string;
+  headmaster_name?: string;
+  headmaster_nip?: string;
+  kpu_chairman?: string;
+  kpu_secretary?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  website_url?: string;
 }
 
 export interface QuickCountStats {

@@ -21,11 +21,16 @@ import { CandidateDetailModal } from './components/CandidateDetailModal';
 import { VoteConfirmModal } from './components/VoteConfirmModal';
 import { VoteReceiptModal } from './components/VoteReceiptModal';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
+import { PrintBallotCard } from './components/PrintBallotCard';
+import { RecapResults } from './components/RecapResults';
+import { OfficialReport } from './components/OfficialReport';
 import { Footer } from './components/Footer';
 
 export default function App() {
   // Navigation State
-  const [activeTab, setActiveTab] = useState<'beranda' | 'quickcount' | 'voting' | 'admin'>('beranda');
+  const [activeTab, setActiveTab] = useState<
+    'beranda' | 'quickcount' | 'voting' | 'admin' | 'kartu-suara' | 'rekapitulasi' | 'berita-acara'
+  >('beranda');
 
   // Dark Mode State
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -201,6 +206,7 @@ export default function App() {
         setDarkMode={setDarkMode}
         onOpenSupabaseModal={() => setShowSupabaseModal(true)}
         isSupabaseActive={isSupabaseConfigured}
+        settings={settings}
       />
 
       {/* Main View Router */}
@@ -220,6 +226,9 @@ export default function App() {
                 }
               }}
               onViewQuickCount={() => setActiveTab('quickcount')}
+              onViewBallot={() => setActiveTab('kartu-suara')}
+              onViewRecap={() => setActiveTab('rekapitulasi')}
+              onViewReport={() => setActiveTab('berita-acara')}
             />
 
             {/* Candidates Section */}
@@ -243,6 +252,37 @@ export default function App() {
             users={users}
             onRefresh={loadData}
             isRealtimeActive={true}
+          />
+        )}
+
+        {activeTab === 'kartu-suara' && (
+          <PrintBallotCard
+            candidates={candidates}
+            users={users}
+            settings={settings}
+            onBack={() => setActiveTab('beranda')}
+          />
+        )}
+
+        {activeTab === 'rekapitulasi' && (
+          <RecapResults
+            candidates={candidates}
+            users={users}
+            votes={votes}
+            settings={settings}
+            stats={stats}
+            onBack={() => setActiveTab('beranda')}
+          />
+        )}
+
+        {activeTab === 'berita-acara' && (
+          <OfficialReport
+            candidates={candidates}
+            users={users}
+            votes={votes}
+            settings={settings}
+            stats={stats}
+            onBack={() => setActiveTab('beranda')}
           />
         )}
 
@@ -282,7 +322,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer settings={settings} />
 
       {/* Modals & Dialogs */}
       {/* 1. Login Modal */}
@@ -329,6 +369,7 @@ export default function App() {
             setReceiptData(null);
             setActiveTab('quickcount');
           }}
+          settings={settings}
         />
       )}
 
