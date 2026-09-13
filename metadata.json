@@ -1,0 +1,6 @@
+{
+  "name": "E-Voting OSIS",
+  "description": "Aplikasi E-Voting Pemilihan Ketua & Wakil Ketua OSIS modern dengan quick count real-time, transparansi anti-double-vote, dan panel admin.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
