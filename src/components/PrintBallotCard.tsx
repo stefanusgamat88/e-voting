@@ -11,14 +11,18 @@ import {
   ShieldCheck,
   Info,
   Filter,
+  UploadCloud,
+  Camera,
 } from 'lucide-react';
 import { Candidate, ElectionSettings, User } from '../types';
+import { CandidatePhotoUploadModal } from './CandidatePhotoUploadModal';
 
 interface PrintBallotCardProps {
   candidates: Candidate[];
   users: User[];
   settings: ElectionSettings;
   onBack?: () => void;
+  onUpdateCandidatePhoto?: (candidateId: string, photoUrl: string) => void;
 }
 
 export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
@@ -26,9 +30,11 @@ export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
   users,
   settings,
   onBack,
+  onUpdateCandidatePhoto,
 }) => {
   const [activeMode, setActiveMode] = useState<'surat-suara' | 'kartu-pemilih'>('surat-suara');
   const [selectedClass, setSelectedClass] = useState<string>('all');
+  const [candidateToUpload, setCandidateToUpload] = useState<Candidate | null>(null);
 
   const schoolName = settings.school_name || 'SMA NEGERI 1 TELADAN';
   const orgName = settings.organization_name || 'KOMISI PEMILIHAN UMUM OSIS & MPK';
@@ -46,6 +52,15 @@ export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
 
   const handlePrint = () => {
     window.print();
+  };
+
+  // Official ballot grid columns based on candidate count
+  const getBallotGridClass = (count: number) => {
+    if (count === 1) return 'grid grid-cols-1 max-w-sm mx-auto gap-4';
+    if (count === 2) return 'grid grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto';
+    if (count === 3) return 'grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4';
+    if (count === 4) return 'grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4';
+    return 'grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4';
   };
 
   return (
@@ -102,6 +117,19 @@ export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
                 <span>Kartu Pemilih (DPT)</span>
               </button>
             </div>
+
+            {/* Quick Candidate Photo Upload Button (Visible in Surat Suara mode) */}
+            {activeMode === 'surat-suara' && onUpdateCandidatePhoto && (
+              <button
+                type="button"
+                onClick={() => setCandidateToUpload(candidates[0] || null)}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm shadow-sm transition-all hover:scale-[1.02] cursor-pointer"
+                title="Upload atau ganti foto calon OSIS"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Upload Foto Paslon</span>
+              </button>
+            )}
 
             {/* Print Action Button */}
             <button
@@ -207,36 +235,60 @@ export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
               </div>
             </div>
 
-            {/* Kotak Kandidat Surat Suara */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            {/* Kotak Kandidat Surat Suara Resmi (Grid Dinamis & Rapi) */}
+            <div className={`${getBallotGridClass(candidates.length)} pt-2`}>
               {candidates.map((candidate) => (
                 <div
                   key={candidate.id}
-                  className="border-2 border-slate-900 rounded-2xl p-4 flex flex-col items-center justify-between text-center bg-slate-50 relative overflow-hidden"
+                  className="border-2 border-slate-900 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between text-center bg-slate-50 relative overflow-hidden shadow-xs hover:border-blue-600 transition-colors"
                 >
                   {/* Nomor Urut Lingkaran Besar */}
-                  <div className="w-14 h-14 rounded-full bg-slate-900 text-white font-black text-2xl flex items-center justify-center mb-3 shadow-md">
+                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-slate-900 text-white font-black text-xl sm:text-2xl flex items-center justify-center mb-3 shadow-md">
                     0{candidate.nomor_urut}
                   </div>
 
-                  {/* Foto Paslon */}
-                  <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-400 mb-3 bg-slate-200">
+                  {/* Foto Paslon (Proporsional Tegak Portrait 3:4 Standar Pas Foto Resmi) */}
+                  <div className="w-full max-w-[200px] sm:max-w-[220px] mx-auto aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-300 mb-3 bg-slate-200 shadow-xs relative group">
                     <img
                       src={candidate.foto}
                       alt={candidate.nama_ketua}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top"
                     />
+                    {onUpdateCandidatePhoto && (
+                      <button
+                        type="button"
+                        onClick={() => setCandidateToUpload(candidate)}
+                        className="no-print print:hidden absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity p-2 text-center cursor-pointer"
+                        title="Klik untuk Upload / Ganti Foto Paslon ini"
+                      >
+                        <Camera className="w-7 h-7 mb-1 text-amber-300" />
+                        <span className="text-xs font-bold">Ganti Foto</span>
+                      </button>
+                    )}
                   </div>
+
+                  {/* Tombol Upload Cepat di Surat Suara (Hanya terlihat di layar / disembunyikan saat dicetak) */}
+                  {onUpdateCandidatePhoto && (
+                    <button
+                      type="button"
+                      onClick={() => setCandidateToUpload(candidate)}
+                      className="no-print print:hidden mb-2 px-3 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center gap-1 mx-auto cursor-pointer transition-colors shadow-2xs"
+                      title="Upload foto baru untuk paslon ini"
+                    >
+                      <UploadCloud className="w-3 h-3 text-blue-600" />
+                      <span>Upload Foto No. 0{candidate.nomor_urut}</span>
+                    </button>
+                  )}
 
                   {/* Nama Paslon */}
                   <div className="space-y-1 mb-4 flex-1">
-                    <div className="bg-slate-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-slate-700">
+                    <div className="bg-slate-200 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-slate-700">
                       Calon Ketua &amp; Wakil
                     </div>
-                    <h3 className="font-black text-sm text-slate-900 leading-tight">
+                    <h3 className="font-black text-sm sm:text-base text-slate-900 leading-tight">
                       {candidate.nama_ketua}
                     </h3>
-                    <p className="text-xs font-semibold text-slate-700">
+                    <p className="text-xs sm:text-sm font-semibold text-slate-700">
                       &amp; {candidate.nama_wakil}
                     </p>
                     {candidate.kelas_ketua && (
@@ -248,8 +300,8 @@ export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
 
                   {/* Area Coblosan Surat Suara */}
                   <div className="w-full pt-3 border-t-2 border-dashed border-slate-400">
-                    <div className="w-20 h-16 mx-auto rounded-xl border-2 border-slate-900 border-dashed bg-white flex flex-col items-center justify-center p-1">
-                      <span className="text-[9px] font-extrabold uppercase text-slate-500">
+                    <div className="w-22 h-16 mx-auto rounded-xl border-2 border-slate-900 border-dashed bg-white flex flex-col items-center justify-center p-1 shadow-2xs">
+                      <span className="text-[9px] font-extrabold uppercase text-slate-500 tracking-wider">
                         KOTAK COBLOS
                       </span>
                       <span className="text-xs font-black text-slate-900">
@@ -386,6 +438,19 @@ export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
               ))}
             </div>
           </div>
+        )}
+
+        {/* Candidate Photo Upload Modal */}
+        {candidateToUpload && onUpdateCandidatePhoto && (
+          <CandidatePhotoUploadModal
+            candidates={candidates}
+            selectedCandidate={candidateToUpload}
+            onClose={() => setCandidateToUpload(null)}
+            onSavePhoto={(candidateId, photoUrl) => {
+              onUpdateCandidatePhoto(candidateId, photoUrl);
+              setCandidateToUpload(null);
+            }}
+          />
         )}
       </div>
     </div>

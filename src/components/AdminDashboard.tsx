@@ -25,6 +25,7 @@ import {
   FileText,
   Image as ImageIcon,
   UploadCloud,
+  Camera,
 } from 'lucide-react';
 import { Candidate, ElectionSettings, QuickCountStats, User, Vote } from '../types';
 import { exportToCSV, formatDateIndonesian } from '../lib/utils';
@@ -32,6 +33,7 @@ import { InstitutionSettings } from './InstitutionSettings';
 import { PrintBallotCard } from './PrintBallotCard';
 import { RecapResults } from './RecapResults';
 import { OfficialReport } from './OfficialReport';
+import { CandidatePhotoUploadModal } from './CandidatePhotoUploadModal';
 import {
   resetAllVotes,
   resetToInitialData,
@@ -87,6 +89,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     visi: '',
     misi: '',
   });
+  const [candidateToUploadPhoto, setCandidateToUploadPhoto] = useState<Candidate | null>(null);
+
+  // Quick photo upload handler
+  const handleQuickUpdateCandidatePhoto = (candidateId: string, photoUrl: string) => {
+    const updated = candidates.map((c) => {
+      if (c.id === candidateId) {
+        return { ...c, foto: photoUrl };
+      }
+      return c;
+    });
+    saveCandidates(updated);
+    const target = candidates.find((c) => c.id === candidateId);
+    showToast(`Foto Paslon No. 0${target?.nomor_urut || ''} berhasil diperbarui!`);
+    onRefresh();
+  };
+
+  // Form candidate file upload processor (with canvas compression)
+  const handleFormCandidateFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxWidth = 800;
+        const maxHeight = 1066;
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          setCandForm((prev) => ({ ...prev, foto: canvas.toDataURL('image/jpeg', 0.88) }));
+        } else {
+          setCandForm((prev) => ({ ...prev, foto: event.target?.result as string }));
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Voter Search & Filter State
   const [voterSearch, setVoterSearch] = useState('');
@@ -365,6 +420,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
 
           <button
+            id="btn-admin-upload-candidate-photo-top"
+            onClick={() => setCandidateToUploadPhoto(candidates[0] || null)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer bg-amber-50 dark:bg-amber-950/70 hover:bg-amber-100 dark:hover:bg-amber-900 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shadow-2xs"
+            title="Upload atau ganti foto calon OSIS"
+          >
+            <Camera className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            <span>Upload Foto Paslon</span>
+          </button>
+
+          <button
             id="btn-admin-institution-shortcut"
             onClick={() => setAdminTab('institution')}
             className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -606,17 +671,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 2: MANAGE CANDIDATES */}
       {adminTab === 'candidates' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              Daftar Pasangan Calon Terdaftar
-            </h3>
-            <button
-              onClick={handleOpenAddCandidate}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Tambah Paslon Baru</span>
-            </button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Daftar Pasangan Calon Terdaftar
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Kelola data kandidat, visi misi, dan foto resmi untuk surat suara
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCandidateToUploadPhoto(candidates[0] || null)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md transition-all cursor-pointer"
+                title="Upload atau ganti foto pasangan calon OSIS"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Upload Foto Paslon</span>
+              </button>
+              <button
+                onClick={handleOpenAddCandidate}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah Paslon Baru</span>
+              </button>
+            </div>
           </div>
 
           {/* Form Modal for Add/Edit */}
@@ -718,17 +799,72 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   />
                 </div>
 
-                <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                    URL Foto Kandidat
-                  </label>
-                  <input
-                    type="text"
-                    value={candForm.foto}
-                    onChange={(e) => setCandForm({ ...candForm, foto: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900"
-                    required
-                  />
+                {/* Rich Candidate Photo Upload Section in Form */}
+                <div className="sm:col-span-2 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-slate-700 dark:text-slate-300">
+                      Foto Paslon Resmi (Tegak Portrait 3:4)
+                    </label>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Disarankan pas foto berjas / seragam rapi
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center gap-4">
+                    {/* Thumbnail Preview */}
+                    <div className="w-24 h-32 rounded-xl overflow-hidden border-2 border-slate-300 dark:border-slate-700 bg-slate-200 dark:bg-slate-800 shrink-0 shadow-xs relative">
+                      {candForm.foto ? (
+                        <img
+                          src={candForm.foto}
+                          alt="Pratinjau"
+                          className="w-full h-full object-cover object-top"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 text-[10px] p-2 text-center">
+                          <Camera className="w-6 h-6 mb-1 text-slate-400" />
+                          <span>Belum ada foto</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Upload Actions */}
+                    <div className="flex-1 space-y-2.5 w-full">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors">
+                          <UploadCloud className="w-4 h-4" />
+                          <span>Pilih Berkas Foto dari HP / PC</span>
+                          <input
+                            type="file"
+                            accept="image/png, image/jpeg, image/jpg, image/webp"
+                            className="hidden"
+                            onChange={handleFormCandidateFile}
+                          />
+                        </label>
+                        {candForm.foto && (
+                          <button
+                            type="button"
+                            onClick={() => setCandForm({ ...candForm, foto: '' })}
+                            className="px-3 py-2 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-semibold"
+                          >
+                            Hapus Foto
+                          </button>
+                        )}
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mb-1">
+                          Atau tempel URL gambar langsung dari internet:
+                        </span>
+                        <input
+                          type="text"
+                          value={candForm.foto}
+                          onChange={(e) => setCandForm({ ...candForm, foto: e.target.value })}
+                          placeholder="https://images.unsplash.com/..."
+                          className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="sm:col-span-2">
@@ -784,25 +920,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {candidates.map((c) => (
               <div
                 key={c.id}
-                className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between"
+                className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
               >
                 <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <img
-                      src={c.foto}
-                      alt={c.nama_ketua}
-                      className="w-12 h-12 rounded-xl object-cover"
-                    />
-                    <div>
-                      <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-black text-xs">
+                  <div className="flex items-start gap-3.5 mb-3">
+                    {/* Portrait Photo Frame with Hover Upload Trigger */}
+                    <div className="w-16 h-22 rounded-xl overflow-hidden border-2 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0 shadow-xs relative group">
+                      <img
+                        src={c.foto}
+                        alt={c.nama_ketua}
+                        className="w-full h-full object-cover object-top"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setCandidateToUploadPhoto(c)}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity cursor-pointer p-1"
+                        title="Upload foto baru"
+                      >
+                        <Camera className="w-5 h-5 text-amber-300" />
+                        <span className="text-[9px] font-bold">Ganti</span>
+                      </button>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-black text-xs mb-1">
                         No. 0{c.nomor_urut}
                       </span>
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-0.5">
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-tight truncate">
                         {c.nama_ketua}
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                         &amp; {c.nama_wakil}
                       </p>
+                      {c.kelas_ketua && (
+                        <span className="text-[10px] text-slate-400 block mt-0.5">
+                          {c.kelas_ketua} &bull; {c.kelas_wakil}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -811,22 +965,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </p>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
                   <button
-                    onClick={() => handleEditCandidate(c)}
-                    className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold flex items-center gap-1"
+                    type="button"
+                    onClick={() => setCandidateToUploadPhoto(c)}
+                    className="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                    title="Upload foto calon ini"
                   >
-                    <Edit2 className="w-3.5 h-3.5 text-blue-500" />
-                    <span>Edit</span>
+                    <Camera className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                    <span>Upload Foto</span>
                   </button>
 
-                  <button
-                    onClick={() => handleDeleteCandidate(c.id)}
-                    className="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-semibold flex items-center gap-1"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Hapus</span>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleEditCandidate(c)}
+                      className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                      title="Edit data paslon"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteCandidate(c.id)}
+                      className="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                      title="Hapus paslon"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1030,6 +1198,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           users={users}
           settings={settings}
           onBack={() => setAdminTab('overview')}
+          onUpdateCandidatePhoto={handleQuickUpdateCandidatePhoto}
         />
       )}
 
@@ -1215,6 +1384,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal Upload & Ganti Foto Paslon OSIS */}
+      {candidateToUploadPhoto && (
+        <CandidatePhotoUploadModal
+          candidates={candidates}
+          selectedCandidate={candidateToUploadPhoto}
+          onClose={() => setCandidateToUploadPhoto(null)}
+          onSavePhoto={(candidateId, photoUrl) => {
+            handleQuickUpdateCandidatePhoto(candidateId, photoUrl);
+            setCandidateToUploadPhoto(null);
+          }}
+        />
       )}
     </div>
   );
