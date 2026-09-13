@@ -125,22 +125,235 @@ export function saveSettings(settings: ElectionSettings) {
   notifyRealtime();
 }
 
-// Auth State
+// Auth State & Session TTL Management
+export const SESSION_STORAGE_KEYS = {
+  CURRENT_USER: 'evoting_current_user',
+  SESSION_EXPIRY: 'evoting_session_expiry',
+  SESSION_LOGIN_TIME: 'evoting_session_login_time',
+};
+
+// Default voter session validity duration (15 minutes of safe voter booth time)
+export const DEFAULT_SESSION_DURATION_MS = 15 * 60 * 1000;
+
 export function getCurrentUser(): User | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-    return raw ? JSON.parse(raw) : null;
+    const raw = localStorage.getItem(SESSION_STORAGE_KEYS.CURRENT_USER);
+    if (!raw) return null;
+
+    // Check if session has expired locally
+    const rawExpiry = localStorage.getItem(SESSION_STORAGE_KEYS.SESSION_EXPIRY);
+    if (rawExpiry) {
+      const expiry = Number(rawExpiry);
+      if (!isNaN(expiry) && Date.now() >= expiry) {
+        // Expired, clear out
+        logoutUser('Sesi login telah kedaluwarsa.');
+        return null;
+      }
+    }
+
+    return JSON.parse(raw);
   } catch {
     return null;
   }
 }
 
-export function setCurrentUser(user: User | null) {
+export function setCurrentUser(user: User | null, customTtlMs = DEFAULT_SESSION_DURATION_MS) {
   if (user) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+    localStorage.setItem(SESSION_STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+    const expiryTimestamp = Date.now() + customTtlMs;
+    localStorage.setItem(SESSION_STORAGE_KEYS.SESSION_EXPIRY, String(expiryTimestamp));
+    localStorage.setItem(SESSION_STORAGE_KEYS.SESSION_LOGIN_TIME, String(Date.now()));
   } else {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    localStorage.removeItem(SESSION_STORAGE_KEYS.CURRENT_USER);
+    localStorage.removeItem(SESSION_STORAGE_KEYS.SESSION_EXPIRY);
+    localStorage.removeItem(SESSION_STORAGE_KEYS.SESSION_LOGIN_TIME);
   }
+}
+
+// Extend session on deliberate voter activity (e.g. typing or voting)
+export function touchSession(extendMs = DEFAULT_SESSION_DURATION_MS) {
+  const currentUser = localStorage.getItem(SESSION_STORAGE_KEYS.CURRENT_USER);
+  if (currentUser) {
+    const newExpiry = Date.now() + extendMs;
+    localStorage.setItem(SESSION_STORAGE_KEYS.SESSION_EXPIRY, String(newExpiry));
+  }
+}
+
+// Get remaining session seconds
+export function getSessionRemainingSeconds(): number {
+  const rawExpiry = localStorage.getItem(SESSION_STORAGE_KEYS.SESSION_EXPIRY);
+  if (!rawExpiry) return 0;
+  const expiry = Number(rawExpiry);
+  if (isNaN(expiry)) return 0;
+  const diff = Math.floor((expiry - Date.now()) / 1000);
+  return Math.max(0, diff);
+}
+
+// Perform a comprehensive check of Supabase and local session status
+export async function checkSessionExpired(): Promise<{
+  isExpired: boolean;
+  reason?: string;
+}> {
+  // 1. If not logged in locally, nothing to expire
+  const localUserRaw = localStorage.getItem(SESSION_STORAGE_KEYS.CURRENT_USER);
+  if (!localUserRaw) {
+    return { isExpired: false };
+  }
+
+  // 2. Check Supabase Auth session if Supabase client is configured
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        return {
+          isExpired: true,
+          reason: 'Token autentikasi Supabase tidak valid atau gagal diverifikasi.',
+        };
+      }
+
+      const session = data?.session;
+      if (session) {
+        // Supabase JWT expires_at is epoch seconds
+        if (session.expires_at && session.expires_at * 1000 <= Date.now()) {
+          return {
+            isExpired: true,
+            reason: 'Sesi token autentikasi Supabase telah kedaluwarsa.',
+          };
+        }
+      }
+    } catch (err) {
+      console.warn('Gagal memverifikasi status sesi Supabase:', err);
+    }
+  }
+
+  // 3. Check local voter booth session expiry
+  const rawExpiry = localStorage.getItem(SESSION_STORAGE_KEYS.SESSION_EXPIRY);
+  if (rawExpiry) {
+    const expiry = Number(rawExpiry);
+    if (!isNaN(expiry) && Date.now() >= expiry) {
+      return {
+        isExpired: true,
+        reason: 'Batas waktu sesi pemilih (15 menit) telah berakhir demi menjaga kerahasiaan bilik suara.',
+      };
+    }
+  }
+
+  return { isExpired: false };
+}
+
+// Complete user logout including Supabase sign-out
+export async function logoutUser(reason?: string): Promise<void> {
+  // Remove local storage credentials
+  localStorage.removeItem(SESSION_STORAGE_KEYS.CURRENT_USER);
+  localStorage.removeItem(SESSION_STORAGE_KEYS.SESSION_EXPIRY);
+  localStorage.removeItem(SESSION_STORAGE_KEYS.SESSION_LOGIN_TIME);
+
+  // Sign out from Supabase if connected
+  if (supabase) {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn('Supabase signOut error:', err);
+    }
+  }
+
+  // Dispatch custom window event so all tabs/components are notified
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('evoting:session_expired', {
+        detail: {
+          reason:
+            reason ||
+            'Sesi Anda telah berakhir secara otomatis demi menjaga integritas data pemilihan.',
+        },
+      })
+    );
+  }
+}
+
+// Setup automated periodic and event-based watcher for session expiration
+export function setupSessionExpirationWatcher(
+  onExpired: (reason: string) => void
+): () => void {
+  let isChecking = false;
+
+  const runCheck = async () => {
+    if (isChecking) return;
+    isChecking = true;
+    try {
+      const result = await checkSessionExpired();
+      if (result.isExpired) {
+        const reason =
+          result.reason ||
+          'Sesi Anda telah berakhir secara otomatis demi menjaga keamanan data pemilih.';
+        await logoutUser(reason);
+        onExpired(reason);
+      }
+    } finally {
+      isChecking = false;
+    }
+  };
+
+  // 1. Supabase Auth state listener
+  let authSubscription: { unsubscribe: () => void } | null = null;
+  if (supabase) {
+    try {
+      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+          const reason = 'Sesi Supabase telah terputus (Signed Out).';
+          await logoutUser(reason);
+          onExpired(reason);
+        } else if (session?.expires_at && session.expires_at * 1000 <= Date.now()) {
+          const reason = 'Masa berlaku token otentikasi Supabase telah habis.';
+          await logoutUser(reason);
+          onExpired(reason);
+        }
+      });
+      authSubscription = data.subscription;
+    } catch (err) {
+      console.warn('Gagal menginisialisasi listener onAuthStateChange Supabase:', err);
+    }
+  }
+
+  // 2. Periodic background timer check (every 5 seconds)
+  const timerInterval = setInterval(() => {
+    runCheck();
+  }, 5000);
+
+  // 3. Check immediately when window gains focus or tab becomes visible
+  const handleVisibilityOrFocus = () => {
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      runCheck();
+    }
+  };
+
+  // 4. Custom event listener
+  const handleCustomExpiredEvent = (e: Event) => {
+    const customEvt = e as CustomEvent<{ reason?: string }>;
+    onExpired(
+      customEvt.detail?.reason ||
+        'Sesi Anda telah berakhir secara otomatis demi keamanan data pemilih.'
+    );
+  };
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('focus', handleVisibilityOrFocus);
+    window.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    window.addEventListener('evoting:session_expired', handleCustomExpiredEvent);
+  }
+
+  // Cleanup watcher
+  return () => {
+    clearInterval(timerInterval);
+    if (authSubscription) {
+      authSubscription.unsubscribe();
+    }
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+      window.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('evoting:session_expired', handleCustomExpiredEvent);
+    }
+  };
 }
 
 // ==========================================

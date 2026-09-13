@@ -124,6 +124,19 @@ export const SupabaseConfigModal: React.FC<SupabaseConfigModalProps> = ({
             </span>
           </div>
 
+          {/* Automatic Session Expiry & Security Banner */}
+          <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 flex items-start gap-3 text-xs">
+            <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-bold text-blue-900 dark:text-blue-200">
+                Pengecekan Otomatis Sesi &amp; Auto-Logout Aktif
+              </p>
+              <p className="text-blue-700 dark:text-blue-400 leading-relaxed">
+                Sistem memonitor token Supabase dan sesi pemilih secara berkala. Jika token kedaluwarsa atau sesi berakhir, pengguna akan otomatis dilogout untuk menjaga kerahasiaan suara dan mencegah sesi menggantung.
+              </p>
+            </div>
+          </div>
+
           {/* Form */}
           <form onSubmit={handleSaveKeys} className="space-y-4">
             <div>

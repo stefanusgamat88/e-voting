@@ -8,6 +8,9 @@ import {
   setCurrentUser,
   submitVote,
   subscribeToRealtime,
+  setupSessionExpirationWatcher,
+  logoutUser,
+  touchSession,
 } from './lib/supabase';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -21,6 +24,7 @@ import { CandidateDetailModal } from './components/CandidateDetailModal';
 import { VoteConfirmModal } from './components/VoteConfirmModal';
 import { VoteReceiptModal } from './components/VoteReceiptModal';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
+import { SessionExpiredModal } from './components/SessionExpiredModal';
 import { PrintBallotCard } from './components/PrintBallotCard';
 import { RecapResults } from './components/RecapResults';
 import { OfficialReport } from './components/OfficialReport';
@@ -58,6 +62,7 @@ export default function App() {
 
   // Current Logged-in User
   const [currentUser, setCurrentUserState] = useState<User | null>(null);
+  const [sessionExpiredReason, setSessionExpiredReason] = useState<string | null>(null);
 
   // Modals
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -111,6 +116,45 @@ export default function App() {
     };
   }, [loadData]);
 
+  // Automated Watcher for Session Expiration (Supabase token expired or session timeout)
+  useEffect(() => {
+    const cleanupWatcher = setupSessionExpirationWatcher((reason: string) => {
+      setCurrentUserState(null);
+      setSessionExpiredReason(reason);
+      if (activeTab === 'admin' || activeTab === 'voting') {
+        setActiveTab('beranda');
+      }
+    });
+
+    return () => {
+      cleanupWatcher();
+    };
+  }, [activeTab]);
+
+  // Activity Keep-Alive: Debounced touch session when logged-in user interacts
+  useEffect(() => {
+    if (!currentUser) return;
+
+    let lastTouch = Date.now();
+    const handleUserActivity = () => {
+      // Refresh session TTL every 30 seconds upon active user interaction
+      if (Date.now() - lastTouch > 30000) {
+        lastTouch = Date.now();
+        touchSession();
+      }
+    };
+
+    window.addEventListener('click', handleUserActivity);
+    window.addEventListener('keydown', handleUserActivity);
+    window.addEventListener('touchstart', handleUserActivity);
+
+    return () => {
+      window.removeEventListener('click', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+      window.removeEventListener('touchstart', handleUserActivity);
+    };
+  }, [currentUser]);
+
   // Calculate Quick Count Metrics
   const stats: QuickCountStats = calculateQuickCount(candidates, votes, users);
 
@@ -119,6 +163,7 @@ export default function App() {
     setCurrentUser(user);
     setCurrentUserState(user);
     setShowLoginModal(false);
+    setSessionExpiredReason(null);
 
     if (user.role === 'admin') {
       setActiveTab('admin');
@@ -132,8 +177,8 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
-    setCurrentUser(null);
+  const handleLogout = async () => {
+    await logoutUser('Pengguna keluar secara manual.');
     setCurrentUserState(null);
     if (activeTab === 'admin' || activeTab === 'voting') {
       setActiveTab('beranda');
@@ -378,6 +423,18 @@ export default function App() {
         <SupabaseConfigModal
           onClose={() => setShowSupabaseModal(false)}
           onRefresh={loadData}
+        />
+      )}
+
+      {/* 6. Session Expired Security Modal */}
+      {sessionExpiredReason && (
+        <SessionExpiredModal
+          reason={sessionExpiredReason}
+          onClose={() => setSessionExpiredReason(null)}
+          onReLogin={() => {
+            setSessionExpiredReason(null);
+            setShowLoginModal(true);
+          }}
         />
       )}
     </div>
