@@ -73,10 +73,10 @@ export const RecapResults: React.FC<RecapResultsProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 py-8 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 py-8 px-4 sm:px-6 print:min-h-0 print:bg-white print:p-0 print:m-0">
+      <div className="max-w-5xl mx-auto space-y-6 print:max-w-none print:space-y-0 print:m-0 print:p-0">
         {/* Navigation & Toolbar (Hidden in Print) */}
-        <div className="no-print p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="no-print print:hidden p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {onBack && (
               <button
@@ -193,10 +193,10 @@ export const RecapResults: React.FC<RecapResultsProps> = ({
                       2. Jumlah Pemilih yang Menggunakan Hak Suara (Suara Masuk)
                     </td>
                     <td className="py-2 px-3 text-center font-bold font-mono text-blue-900 border-r border-slate-300">
-                      {stats.totalVotes}
+                      {stats.totalSuaraMasuk}
                     </td>
                     <td className="py-2 px-3 text-center font-bold font-mono text-blue-900">
-                      {stats.turnoutPercentage}%
+                      {stats.persentasePartisipasi}%
                     </td>
                   </tr>
                   <tr>
@@ -204,10 +204,10 @@ export const RecapResults: React.FC<RecapResultsProps> = ({
                       3. Jumlah Pemilih yang Belum / Tidak Menggunakan Hak Suara
                     </td>
                     <td className="py-2 px-3 text-center font-mono border-r border-slate-300">
-                      {stats.totalDPT - stats.totalVotes}
+                      {stats.totalBelumMemilih}
                     </td>
                     <td className="py-2 px-3 text-center font-mono">
-                      {(100 - stats.turnoutPercentage).toFixed(1)}%
+                      {stats.totalDPT > 0 ? (100 - stats.persentasePartisipasi).toFixed(1) : '0.0'}%
                     </td>
                   </tr>
                 </tbody>

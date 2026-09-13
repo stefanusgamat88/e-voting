@@ -110,10 +110,10 @@ ${specialNotes}
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 py-8 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 py-8 px-4 sm:px-6 print:min-h-0 print:bg-white print:p-0 print:m-0">
+      <div className="max-w-5xl mx-auto space-y-6 print:max-w-none print:space-y-0 print:m-0 print:p-0">
         {/* Navigation & Toolbar (Hidden in Print) */}
-        <div className="no-print p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="no-print print:hidden p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {onBack && (
               <button
@@ -157,7 +157,7 @@ ${specialNotes}
         </div>
 
         {/* Form Editor Mini Panel (Hidden in Print) */}
-        <div className="no-print p-4 sm:p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 space-y-3 text-xs sm:text-sm">
+        <div className="no-print print:hidden p-4 sm:p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 space-y-3 text-xs sm:text-sm">
           <div className="flex items-center gap-2 font-bold text-indigo-950 dark:text-indigo-200">
             <Edit3 className="w-4 h-4 text-indigo-600" />
             <span>Kustomisasi Nomor Dokumen &amp; Lokasi Rapat Pleno:</span>
@@ -296,10 +296,10 @@ ${specialNotes}
               <tfoot className="bg-slate-100 font-bold border-t-2 border-slate-300">
                 <tr>
                   <td colSpan={2} className="py-2 px-3 text-right border-r border-slate-300">
-                    TOTAL SUARA SAH MASUK (PARTISIPASI {stats.turnoutPercentage}%):
+                    TOTAL SUARA SAH MASUK (PARTISIPASI {stats.persentasePartisipasi}%):
                   </td>
                   <td className="py-2 px-3 text-center font-mono border-r border-slate-300">
-                    {stats.totalVotes} Suara
+                    {stats.totalSuaraMasuk} Suara
                   </td>
                   <td className="py-2 px-3 text-center font-mono">100%</td>
                 </tr>

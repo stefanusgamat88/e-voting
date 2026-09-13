@@ -280,17 +280,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     });
 
   return (
-    <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
+    <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in print:p-0 print:m-0 print:max-w-none print:space-y-0 print:bg-transparent">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-slate-900 text-white border border-slate-700 shadow-2xl flex items-center gap-3 animate-fade-in text-sm font-semibold">
+        <div className="no-print print:hidden fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-slate-900 text-white border border-slate-700 shadow-2xl flex items-center gap-3 animate-fade-in text-sm font-semibold">
           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Admin Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+      {/* Admin Top Header (Hidden in Print) */}
+      <div className="no-print print:hidden flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-500/20">
@@ -372,8 +372,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* Admin Subtabs */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 text-xs sm:text-sm font-bold">
+      {/* Admin Subtabs (Hidden in Print) */}
+      <div className="no-print print:hidden flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 text-xs sm:text-sm font-bold">
         <button
           id="tab-admin-overview"
           onClick={() => setAdminTab('overview')}
@@ -1104,7 +1104,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Confirmation Modal for Reset Votes */}
       {showResetVotesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="no-print print:hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-md p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 text-center">
             <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950 text-red-600 mx-auto flex items-center justify-center">
               <AlertTriangle className="w-6 h-6" />
@@ -1140,7 +1140,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Confirmation Modal for Factory Reset */}
       {showFactoryResetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="no-print print:hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-md p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 text-center">
             <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 mx-auto flex items-center justify-center">
               <RotateCcw className="w-6 h-6" />

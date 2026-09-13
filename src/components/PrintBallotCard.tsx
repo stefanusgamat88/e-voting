@@ -49,10 +49,10 @@ export const PrintBallotCard: React.FC<PrintBallotCardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 py-8 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 py-8 px-4 sm:px-6 print:min-h-0 print:bg-white print:p-0 print:m-0">
+      <div className="max-w-5xl mx-auto space-y-6 print:max-w-none print:space-y-0 print:m-0 print:p-0">
         {/* Navigation & Control Toolbar (Hidden in Print) */}
-        <div className="no-print p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="no-print print:hidden p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {onBack && (
               <button
