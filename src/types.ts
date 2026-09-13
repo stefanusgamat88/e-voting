@@ -48,6 +48,8 @@ export interface ElectionSettings {
   };
   // Setting Lembaga (Institution Settings)
   school_logo?: string;
+  school_logo_left?: string;
+  school_logo_right?: string;
   organization_name?: string;
   school_address?: string;
   school_city?: string;

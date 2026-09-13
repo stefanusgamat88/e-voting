@@ -96,7 +96,13 @@ export function getLocalData() {
 
   try {
     const rawSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-    settings = rawSettings ? JSON.parse(rawSettings) : INITIAL_SETTINGS;
+    const parsed = rawSettings ? JSON.parse(rawSettings) : INITIAL_SETTINGS;
+    settings = {
+      ...INITIAL_SETTINGS,
+      ...parsed,
+      school_logo_left: parsed.school_logo_left || parsed.school_logo || INITIAL_SETTINGS.school_logo_left,
+      school_logo_right: parsed.school_logo_right || INITIAL_SETTINGS.school_logo_right,
+    };
   } catch {
     settings = INITIAL_SETTINGS;
   }

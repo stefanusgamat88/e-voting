@@ -72,13 +72,31 @@ export const VoteReceiptModal: React.FC<VoteReceiptModalProps> = ({
         {/* Digital Ballot Receipt Certificate Card */}
         <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-slate-800/90 dark:to-slate-800/40 border border-blue-200/70 dark:border-blue-900/50 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
-            <div>
-              <span className="text-[10px] font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400">
-                Tanda Terima Digital Resmi
-              </span>
-              <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                {settings?.organization_name || 'KPU OSIS'} • {settings?.school_name || 'SMA Negeri 1 Teladan'}
-              </h4>
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center -space-x-1.5 shrink-0">
+                {(settings?.school_logo_left || settings?.school_logo) && (
+                  <img
+                    src={settings?.school_logo_left || settings?.school_logo}
+                    alt="Logo Lembaga"
+                    className="w-8 h-8 rounded-lg object-contain bg-white border border-slate-200 dark:border-slate-600 p-0.5 shadow-xs"
+                  />
+                )}
+                {settings?.school_logo_right && (
+                  <img
+                    src={settings.school_logo_right}
+                    alt="Logo OSIS"
+                    className="w-8 h-8 rounded-lg object-contain bg-white border border-slate-200 dark:border-slate-600 p-0.5 shadow-xs"
+                  />
+                )}
+              </div>
+              <div>
+                <span className="text-[10px] font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400">
+                  Tanda Terima Digital Resmi
+                </span>
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  {settings?.organization_name || 'KPU OSIS'} • {settings?.school_name || 'SMA Negeri 1 Teladan'}
+                </h4>
+              </div>
             </div>
             <div className="p-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600">
               <QrCode className="w-7 h-7 text-slate-800 dark:text-slate-200" />

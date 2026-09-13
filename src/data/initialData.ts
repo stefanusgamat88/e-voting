@@ -14,6 +14,8 @@ export const INITIAL_SETTINGS: ElectionSettings = {
     radius_meters: 1000,
   },
   school_logo: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=200&auto=format&fit=crop&q=80',
+  school_logo_left: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=200&auto=format&fit=crop&q=80',
+  school_logo_right: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&auto=format&fit=crop&q=80',
   organization_name: 'Komisi Pemilihan Umum OSIS & MPK',
   school_address: 'Jl. Pemuda Pendidikan No. 45, Kebayoran Baru',
   school_city: 'Jakarta Selatan',

@@ -23,6 +23,8 @@ import {
   Award,
   FileCheck,
   FileText,
+  Image as ImageIcon,
+  UploadCloud,
 } from 'lucide-react';
 import { Candidate, ElectionSettings, QuickCountStats, User, Vote } from '../types';
 import { exportToCSV, formatDateIndonesian } from '../lib/utils';
@@ -67,6 +69,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     | 'candidates'
     | 'voters'
     | 'institution'
+    | 'logos'
     | 'settings'
   >('overview');
 
@@ -349,6 +352,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
 
           <button
+            id="btn-admin-upload-logos"
+            onClick={() => setAdminTab('logos')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              adminTab === 'logos'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-blue-50 dark:bg-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5" />
+            <span>Upload Logo Kiri &amp; Kanan</span>
+          </button>
+
+          <button
             id="btn-admin-institution-shortcut"
             onClick={() => setAdminTab('institution')}
             className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -463,6 +479,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         >
           <Building2 className="w-4 h-4" />
           <span>Seting Lembaga</span>
+        </button>
+
+        <button
+          id="tab-admin-logos"
+          onClick={() => setAdminTab('logos')}
+          className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
+            adminTab === 'logos'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <ImageIcon className="w-4 h-4" />
+          <span>Upload Logo Kiri &amp; Kanan</span>
         </button>
 
         <button
@@ -1032,9 +1061,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {adminTab === 'institution' && (
         <InstitutionSettings
           settings={settings}
+          initialSection="profile"
           onSave={(updated) => {
             saveSettings(updated);
             showToast('Seting lembaga berhasil diperbarui!');
+            onRefresh();
+          }}
+        />
+      )}
+
+      {/* TAB: UPLOAD LOGO KIRI & KANAN (DEDICATED MENU) */}
+      {adminTab === 'logos' && (
+        <InstitutionSettings
+          settings={settings}
+          initialSection="logos"
+          onSave={(updated) => {
+            saveSettings(updated);
+            showToast('Logo kop surat dan data lembaga berhasil diperbarui!');
             onRefresh();
           }}
         />

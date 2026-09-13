@@ -204,33 +204,47 @@ ${specialNotes}
           {/* Kop Surat Berita Acara */}
           <div className="border-b-4 border-double border-slate-900 pb-4 text-center relative font-sans">
             <div className="flex items-center justify-between gap-4">
-              {settings.school_logo ? (
-                <img
-                  src={settings.school_logo}
-                  alt="Logo"
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
-                />
-              ) : (
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-blue-900 text-white flex items-center justify-center font-black text-xl font-sans">
-                  OSIS
-                </div>
-              )}
+              {/* Logo Kiri (Sekolah / Lambang Lembaga) */}
+              <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center shrink-0">
+                {settings.school_logo_left || settings.school_logo ? (
+                  <img
+                    src={settings.school_logo_left || settings.school_logo}
+                    alt="Logo Kiri Lembaga"
+                    className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                  />
+                ) : (
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-blue-900 text-white flex items-center justify-center font-black text-xl font-sans">
+                    OSIS
+                  </div>
+                )}
+              </div>
 
-              <div className="space-y-0.5 flex-1">
-                <h3 className="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-slate-700 font-sans">
+              <div className="space-y-0.5 flex-1 text-center font-sans">
+                <h3 className="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-slate-700">
                   {orgName}
                 </h3>
-                <h2 className="text-lg sm:text-2xl font-black tracking-tight uppercase text-slate-900 font-sans">
+                <h2 className="text-lg sm:text-2xl font-black tracking-tight uppercase text-slate-900">
                   {schoolName}
                 </h2>
-                <p className="text-[11px] sm:text-xs text-slate-600 font-sans">
+                <p className="text-[11px] sm:text-xs text-slate-600">
                   {schoolAddress}, {schoolCity} &bull; Email: {settings.contact_email || 'osis@sman1teladan.sch.id'}
                 </p>
               </div>
 
-              <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-slate-900 rounded-lg flex flex-col items-center justify-center text-[10px] font-bold p-1 text-center font-sans">
-                <FileText className="w-8 h-8 text-slate-900 mb-0.5" />
-                <span>PLENO</span>
+              {/* Logo Kanan (OSIS / MPK / KPU) */}
+              <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center shrink-0">
+                {settings.school_logo_right ? (
+                  <img
+                    src={settings.school_logo_right}
+                    alt="Logo Kanan OSIS"
+                    className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                  />
+                ) : (
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-slate-900 rounded-lg flex flex-col items-center justify-center text-[10px] font-bold p-1 text-center font-sans">
+                    <FileText className="w-8 h-8 text-slate-900 mb-0.5" />
+                    <span>PLENO</span>
+                  </div>
+                )}
               </div>
             </div>
 
