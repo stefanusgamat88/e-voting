@@ -38,7 +38,7 @@ export const INITIAL_CANDIDATES: Candidate[] = [
     kelas_ketua: 'XI MIPA 1',
     kelas_wakil: 'X-A',
     tagline: 'BERSATU: Bersinergi, Adaptif, Terampil, & Unggul',
-    foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+    foto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
     visi: 'Mewujudkan OSIS yang aspiratif, inklusif, berkarakter luhur, dan aktif menjadi wadah kreativitas serta inovasi siswa di era digital global.',
     misi: [
       'Memaksimalkan penyaluran aspirasi siswa melalui kotak aspirasi digital yang transparan dan ditindaklanjuti cepat.',
@@ -60,7 +60,7 @@ export const INITIAL_CANDIDATES: Candidate[] = [
     kelas_ketua: 'XI IPS 2',
     kelas_wakil: 'XI MIPA 3',
     tagline: 'HARMONI: Hebat, Responsif, Mandiri, Obyektif, & Nyata',
-    foto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80',
+    foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
     visi: 'Membangun lingkungan sekolah yang harmonis, prestatif, disiplin, dan berwawasan masa depan dengan semangat kolaborasi seluruh warga sekolah.',
     misi: [
       'Mengadakan kolaborasi berkala antarorganisasi kesiswaan untuk memajukan prestasi akademik dan non-akademik.',
@@ -82,7 +82,7 @@ export const INITIAL_CANDIDATES: Candidate[] = [
     kelas_ketua: 'XI MIPA 2',
     kelas_wakil: 'X-C',
     tagline: 'AKSI: Aktif, Kolaboratif, Solutif, & Inspiratif',
-    foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+    foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80',
     visi: 'Menjadikan OSIS sebagai pionir aksi nyata pemuda pelajar yang solutif, peduli etika moral, dan berdaya saing internasional.',
     misi: [
       'Mendorong digitalisasi administrasi organisasi siswa untuk efisiensi dan ramah lingkungan.',

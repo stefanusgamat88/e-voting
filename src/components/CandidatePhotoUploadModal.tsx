@@ -19,23 +19,23 @@ interface CandidatePhotoUploadModalProps {
   onSavePhoto: (candidateId: string, photoUrl: string) => void;
 }
 
-// Preset formal photos suited for student election candidates
+// Preset formal photos suited for student election candidates (Half-body portraits)
 const PRESET_PHOTOS = [
   {
-    label: 'Paslon Formal Berbaju Putih / Kemeja',
-    url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+    label: 'Paslon Jas Formal / Setengah Badan Pria',
+    url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
   },
   {
-    label: 'Paslon Berjas / Almamater Hitam-Biru',
-    url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80',
+    label: 'Paslon Jas Almamater / Setengah Badan Wanita',
+    url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
   },
   {
-    label: 'Paslon Siswi / Pelajar Berprestasi',
-    url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80',
+    label: 'Paslon Siswa Karismatik Setengah Badan',
+    url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80',
   },
   {
-    label: 'Paslon Siswa Karismatik & Visioner',
-    url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+    label: 'Paslon Siswi Kemeja Formal Setengah Badan',
+    url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80',
   },
 ];
 

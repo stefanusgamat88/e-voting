@@ -32,31 +32,41 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Modal Header with candidate photo */}
-        <div className="relative h-48 sm:h-56 w-full shrink-0 bg-slate-950 overflow-hidden">
-          <img
-            src={candidate.foto}
-            alt={candidate.nama_ketua}
-            className="w-full h-full object-cover object-top opacity-85"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-
-          {/* Number badge and paslon name */}
-          <div className="absolute bottom-4 left-6 right-6 text-white">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-8 h-8 rounded-full bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center shadow">
+        {/* Modal Header with half-body candidate photo & info */}
+        <div className="relative p-6 sm:p-7 bg-slate-900 text-white shrink-0 border-b border-slate-800">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 pr-10">
+            {/* Foto Portrait Setengah Badan */}
+            <div className="w-24 sm:w-28 aspect-[3/4] rounded-2xl overflow-hidden shadow-xl border-2 border-white/20 bg-slate-800 shrink-0 relative">
+              <img
+                src={candidate.foto}
+                alt={candidate.nama_ketua}
+                className="w-full h-full object-cover object-top"
+              />
+              <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shadow">
                 {nomorFormatted}
-              </span>
-              <span className="text-xs uppercase font-bold tracking-wider text-amber-300">
+              </div>
+            </div>
+
+            {/* Candidate Identification & Names */}
+            <div className="flex-1 min-w-0">
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 font-extrabold text-xs uppercase tracking-wider mb-1.5 border border-amber-400/30">
                 Pasangan Calon No. Urut {nomorFormatted}
               </span>
+              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight truncate">
+                {candidate.nama_ketua}
+              </h2>
+              <p className="text-sm sm:text-base font-semibold text-slate-300">
+                &amp; {candidate.nama_wakil}
+              </p>
+              <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-slate-300">
+                <span className="px-2.5 py-0.5 rounded-md bg-white/10 border border-white/15">
+                  Ketua: {candidate.kelas_ketua || 'Kelas XI'}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-md bg-white/10 border border-white/15">
+                  Wakil: {candidate.kelas_wakil || 'Kelas X'}
+                </span>
+              </div>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
-              {candidate.nama_ketua} &amp; {candidate.nama_wakil}
-            </h2>
-            <p className="text-xs text-slate-300">
-              Calon Ketua: {candidate.kelas_ketua || 'Kelas XI'} • Calon Wakil: {candidate.kelas_wakil || 'Kelas X'}
-            </p>
           </div>
         </div>
 

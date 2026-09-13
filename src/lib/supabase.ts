@@ -76,6 +76,29 @@ export function getLocalData() {
   try {
     const rawCand = localStorage.getItem(STORAGE_KEYS.CANDIDATES);
     candidates = rawCand ? JSON.parse(rawCand) : INITIAL_CANDIDATES;
+    
+    // Auto-migrate any old close-up headshots to formal half-body portraits
+    const oldCloseups: Record<string, string> = {
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80':
+        'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80':
+        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80':
+        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80',
+    };
+
+    let candUpdated = false;
+    candidates = candidates.map((c) => {
+      if (c.foto && oldCloseups[c.foto]) {
+        candUpdated = true;
+        return { ...c, foto: oldCloseups[c.foto] };
+      }
+      return c;
+    });
+
+    if (candUpdated) {
+      saveCandidates(candidates);
+    }
   } catch {
     candidates = INITIAL_CANDIDATES;
   }

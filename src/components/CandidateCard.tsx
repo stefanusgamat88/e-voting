@@ -45,75 +45,89 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
           : 'border-slate-200 dark:border-slate-700/80 shadow-lg hover:border-blue-300 dark:hover:border-blue-600'
       }`}
     >
-      {/* Top Banner & Number Badge */}
-      <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
+      {/* Top Banner & Candidate Photo (Half-Body / Setengah Badan) */}
+      <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] min-h-[360px] max-h-[480px] overflow-hidden bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700/80">
         <img
           src={candidate.foto}
-          alt={`Kandidat Paslon ${nomorFormatted}`}
+          alt={`Foto Paslon ${nomorFormatted} - ${candidate.nama_ketua}`}
           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        {/* Subtle Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
 
-        {/* Circular Number Badge */}
+        {/* Circular Number Badge (Top-Left) */}
         <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
           <div
-            className={`w-14 h-14 rounded-full flex items-center justify-center font-extrabold text-2xl shadow-xl ring-4 ring-white/30 backdrop-blur-sm ${badgeBg}`}
+            className={`w-13 h-13 rounded-full flex items-center justify-center font-black text-2xl shadow-xl ring-4 ring-white/30 backdrop-blur-sm ${badgeBg}`}
           >
             {nomorFormatted}
           </div>
-          <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-xs border border-white/20 uppercase tracking-wide">
+          <span className="px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-white font-black text-xs border border-white/20 uppercase tracking-wider shadow-md">
             Paslon {nomorFormatted}
           </span>
         </div>
 
-        {/* Status Pill if voted */}
+        {/* Status Pill if voted (Top-Right) */}
         {isVotedByMe && (
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white font-bold text-xs shadow-lg animate-bounce">
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500 text-white font-bold text-xs shadow-lg animate-bounce">
             <CheckCircle2 className="w-4 h-4" />
             <span>Pilihan Anda</span>
           </div>
         )}
-
-        {/* Bottom Photo Overlay Info */}
-        <div className="absolute bottom-3 left-4 right-4 text-white">
-          <p className="text-xs font-semibold text-amber-300 tracking-wide uppercase flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            {candidate.tagline || 'Pemimpin Berintegritas & Visioner'}
-          </p>
-          <div className="mt-1">
-            <h3 className="text-lg font-bold leading-snug drop-shadow-sm text-white">
-              {candidate.nama_ketua}
-            </h3>
-            <p className="text-sm font-medium text-slate-200">
-              &amp; {candidate.nama_wakil}
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Body: Vision & Mission Content */}
+      {/* Body: Slogan, Names, Vision & Mission (Slogan diposisikan di sini agar TIDAK menutupi muka) */}
       <div className="flex-1 p-6 flex flex-col justify-between space-y-5">
-        {/* Class badges */}
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-          <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-700">
-            Ketua: {candidate.kelas_ketua || 'Kelas XI'}
-          </span>
-          <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-700">
-            Wakil: {candidate.kelas_wakil || 'Kelas X'}
-          </span>
-        </div>
+        <div className="space-y-4">
+          {/* Slogan & Moto Paslon: Desain banner emas yang mencolok & rapi di bawah foto */}
+          {candidate.tagline && (
+            <div className="p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/30 dark:border-amber-400/25 flex items-start gap-2.5 shadow-2xs">
+              <div className="w-6 h-6 rounded-lg bg-amber-500/20 dark:bg-amber-400/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                <Sparkles className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 block mb-0.5">
+                  Slogan &amp; Moto Paslon
+                </span>
+                <p className="text-xs sm:text-sm font-extrabold text-amber-950 dark:text-amber-200 leading-snug">
+                  "{candidate.tagline}"
+                </p>
+              </div>
+            </div>
+          )}
 
-        {/* Visi */}
-        <div className="space-y-1.5">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
-            <Award className="w-4 h-4" />
-            Visi Utama
-          </h4>
-          <p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3 leading-relaxed italic">
-            "{candidate.visi}"
-          </p>
+          {/* Nama Paslon Ketua & Wakil */}
+          <div className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
+              Kandidat Pemimpin OSIS No. Urut {nomorFormatted}
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">
+              {candidate.nama_ketua}
+            </h3>
+            <p className="text-sm sm:text-base font-semibold text-slate-600 dark:text-slate-300">
+              &amp; {candidate.nama_wakil}
+            </p>
+
+            {/* Class badges */}
+            <div className="flex flex-wrap items-center gap-2 pt-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-700">
+                Ketua: {candidate.kelas_ketua || 'Kelas XI'}
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-700">
+                Wakil: {candidate.kelas_wakil || 'Kelas X'}
+              </span>
+            </div>
+          </div>
+
+          {/* Visi */}
+          <div className="space-y-1.5 pt-1">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+              <Award className="w-4 h-4" />
+              Visi Utama
+            </h4>
+            <p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3 leading-relaxed italic bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+              "{candidate.visi}"
+            </p>
+          </div>
         </div>
 
         {/* Misi (Bullet List) */}
