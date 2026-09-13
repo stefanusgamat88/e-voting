@@ -1,17 +1,8 @@
 import React from 'react';
 import {
-  Vote,
-  BarChart3,
-  Users,
-  ShieldCheck,
-  CheckCircle,
-  Radio,
-  Clock,
-  ArrowRight,
-  Lock,
-  Printer,
-  Award,
-  FileCheck,
+  Sparkles,
+  LogIn,
+  TrendingUp,
 } from 'lucide-react';
 import { QuickCountStats, ElectionSettings, User } from '../types';
 
@@ -32,222 +23,129 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   currentUser,
   onStartVoting,
   onViewQuickCount,
-  onViewBallot,
-  onViewRecap,
-  onViewReport,
 }) => {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#061838] via-[#0A2660] to-[#14479E] text-white py-16 sm:py-24 lg:py-28 px-4 sm:px-6 lg:px-8">
-      {/* Background Decorative Tech / Mesh Accents */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-blue-400 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-cyan-400 blur-3xl" />
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)`,
-            backgroundSize: '32px 32px',
-          }}
-        />
-      </div>
-
+    <section className="relative overflow-hidden bg-gradient-to-r from-[#1d5ce5] via-[#2165f1] to-[#2563eb] text-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-12">
       <div className="relative max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* Left Column: Heading, Subtitle & Action Buttons */}
-          <div className="lg:col-span-7 space-y-6 text-left">
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-semibold text-blue-200">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span>{settings.school_name} • {settings.period}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left Column: Title & Actions */}
+          <div className="lg:col-span-7 space-y-5 text-left">
+            {/* Top Pill Tag */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white text-slate-800 text-xs sm:text-sm font-semibold shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+              <span>E-Voting Resmi Siswa &amp; Guru</span>
             </div>
 
-            {/* Main Big Title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-white drop-shadow-sm">
-              PEMILIHAN KETUA &amp; <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-yellow-400">
-                WAKIL KETUA OSIS
-              </span>
+            {/* Main Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              PEMILIHAN KETUA &amp; WAKIL KETUA OSIS
             </h1>
 
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg text-blue-100/90 max-w-2xl leading-relaxed font-normal">
-              Wujudkan regenerasi kepemimpinan pelajar yang berkarakter, berintegritas, dan inovatif.
-              Gunakan hak suaramu secara cerdas, jujur, dan bertanggung jawab melalui sistem voting digital yang transparan dan anti double-vote.
+            {/* Description Subtitle */}
+            <p className="text-sm sm:text-base text-blue-100/90 max-w-xl leading-relaxed">
+              Selamat datang di portal pemilihan OSIS resmi{' '}
+              <span className="font-bold text-white">
+                {settings.school_name || 'SMA NEGERI 1 INDONESIA'}
+              </span>{' '}
+              Tahun Ajaran {settings.period || '2025/2026'}. Gunakan hak suara Anda dengan jujur, adil, dan transparan.
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-3">
-              {/* Primary Yellow Button */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Masuk & Mulai Memilih (Yellow Pill Button) */}
               <button
                 id="btn-hero-vote"
                 onClick={onStartVoting}
-                className="group flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-400 shadow-xl shadow-amber-500/25 hover:shadow-amber-400/40 hover:scale-[1.02] active:scale-[0.99] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full font-bold text-sm sm:text-base bg-[#fbb017] hover:bg-[#e5a013] text-slate-950 shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
-                <Vote className="w-5 h-5 text-slate-950 group-hover:rotate-6 transition-transform" />
-                <span>{currentUser && currentUser.sudah_memilih ? 'Lihat Bukti Pilihan Saya' : 'Masuk & Mulai Memilih'}</span>
-                <ArrowRight className="w-4 h-4 text-slate-900 group-hover:translate-x-1 transition-transform" />
+                <LogIn className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+                <span>
+                  {currentUser && currentUser.sudah_memilih
+                    ? 'Lihat Bukti Pilihan'
+                    : 'Masuk & Mulai Memilih'}
+                </span>
               </button>
 
-              {/* Secondary Outline White Button */}
+              {/* Lihat Quick Count (Outline Pill Button) */}
               <button
                 id="btn-hero-quickcount"
                 onClick={onViewQuickCount}
-                className="flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl font-semibold text-base text-white border-2 border-white/60 hover:border-white hover:bg-white/15 backdrop-blur-sm shadow-md hover:scale-[1.02] active:scale-[0.99] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full font-semibold text-sm sm:text-base border border-white/80 hover:border-white hover:bg-white/10 text-white transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
-                <BarChart3 className="w-5 h-5 text-cyan-300" />
+                <TrendingUp className="w-4 h-4 text-white" />
                 <span>Lihat Quick Count</span>
               </button>
             </div>
-
-            {/* Official Documents Bar: Cetak Kartu Suara, Rekapitulasi, Berita Acara */}
-            <div className="flex flex-wrap items-center gap-2 pt-2">
-              <span className="text-xs font-semibold text-blue-200/90 mr-1">Dokumen Resmi:</span>
-              {onViewBallot && (
-                <button
-                  id="btn-hero-ballot"
-                  onClick={onViewBallot}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
-                >
-                  <Printer className="w-3.5 h-3.5 text-cyan-300" />
-                  <span>Cetak Kartu Suara</span>
-                </button>
-              )}
-              {onViewRecap && (
-                <button
-                  id="btn-hero-recap"
-                  onClick={onViewRecap}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
-                >
-                  <Award className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Rekapitulasi Hasil</span>
-                </button>
-              )}
-              {onViewReport && (
-                <button
-                  id="btn-hero-report"
-                  onClick={onViewReport}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
-                >
-                  <FileCheck className="w-3.5 h-3.5 text-emerald-300" />
-                  <span>Berita Acara</span>
-                </button>
-              )}
-            </div>
-
-            {/* Security Guarantee Badges */}
-            <div className="pt-4 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-blue-200/80 font-medium border-t border-white/10">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                Sistem Anti Double-Vote
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Lock className="w-4 h-4 text-cyan-300" />
-                Enkripsi Suara Terverifikasi
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Radio className="w-4 h-4 text-amber-300 animate-pulse" />
-                Real-Time Quick Count
-              </span>
-            </div>
           </div>
 
-          {/* Right Column: Card Status */}
+          {/* Right Column: Clean Status Card */}
           <div className="lg:col-span-5">
             <div
               id="hero-status-card"
-              className="relative rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-8 shadow-2xl shadow-blue-950/50 text-white"
+              className="rounded-3xl border border-white/20 bg-white/10 backdrop-blur-md p-6 sm:p-7 text-white shadow-xl"
             >
-              {/* Card Header & Status */}
-              <div className="flex items-center justify-between pb-6 border-b border-white/15">
-                <div>
-                  <p className="text-xs uppercase font-bold tracking-wider text-blue-200">
-                    Status Pemilihan
-                  </p>
-                  <h3 className="text-xl font-bold text-white mt-0.5">
-                    Live Status E-Voting
-                  </h3>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold shadow-inner">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span>{settings.status}</span>
+              {/* Header: Status Pemilihan & Pill Tag */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-white/95">
+                  Status Pemilihan
+                </span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#16a34a] text-white text-xs font-bold tracking-wide shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <span>
+                    {(settings.status || 'Sedang Berlangsung').toUpperCase()}
+                  </span>
                 </div>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4 py-6">
+              {/* 2-Column Grid: Total Paslon & Hak Pilih DPT */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-5 mb-4">
                 {/* Total Paslon */}
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-2 text-blue-200 text-xs font-medium mb-1">
-                    <Users className="w-4 h-4 text-amber-300" />
-                    <span>Total Paslon</span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-white">
-                    {stats.candidateStats.length}{' '}
-                    <span className="text-sm font-normal text-blue-200">Kandidat</span>
-                  </div>
-                  <p className="text-[11px] text-blue-200/70 mt-1">
-                    3 Pasangan Calon Resmi
+                <div className="rounded-2xl bg-white/10 p-4 border border-white/10">
+                  <p className="text-xs text-blue-100/80 font-medium">
+                    Total Paslon
+                  </p>
+                  <p className="text-xl sm:text-2xl font-extrabold text-white mt-1">
+                    {stats.candidateStats.length} Pasangan
                   </p>
                 </div>
 
-                {/* Jumlah Pemilih (DPT) */}
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-2 text-blue-200 text-xs font-medium mb-1">
-                    <Vote className="w-4 h-4 text-cyan-300" />
-                    <span>Jumlah Pemilih</span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-white">
-                    {stats.totalDPT.toLocaleString('id-ID')}{' '}
-                    <span className="text-sm font-normal text-blue-200">Siswa</span>
-                  </div>
-                  <p className="text-[11px] text-blue-200/70 mt-1">
-                    Daftar Pemilih Tetap (DPT)
+                {/* Hak Pilih DPT */}
+                <div className="rounded-2xl bg-white/10 p-4 border border-white/10">
+                  <p className="text-xs text-blue-100/80 font-medium">
+                    Hak Pilih DPT
+                  </p>
+                  <p className="text-xl sm:text-2xl font-extrabold text-white mt-1">
+                    {stats.totalDPT} Pemilih
                   </p>
                 </div>
               </div>
 
-              {/* Progress Bar Suara Masuk */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <span className="text-blue-100 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                    Progress Suara Masuk
-                  </span>
-                  <span className="text-amber-300 font-bold text-sm">
-                    {stats.persentasePartisipasi}%
+              {/* Suara Masuk Saat Ini & Progress Bar */}
+              <div className="rounded-2xl bg-white/10 p-4 border border-white/10">
+                <p className="text-xs text-blue-100/80 font-medium">
+                  Suara Masuk Saat Ini
+                </p>
+                <div className="flex items-baseline justify-between mt-1">
+                  <p className="text-xl sm:text-2xl font-extrabold text-white">
+                    {stats.totalSuaraMasuk} Suara
+                  </p>
+                  <span className="inline-block bg-[#fbb017] text-slate-950 font-bold text-xs px-2 py-0.5 rounded">
+                    {stats.persentasePartisipasi.toFixed(1)}%
                   </span>
                 </div>
 
-                {/* Bar */}
-                <div className="w-full h-3 rounded-full bg-black/30 overflow-hidden p-0.5 border border-white/15">
+                {/* Yellow Thin Progress Bar */}
+                <div className="w-full h-2 rounded-full bg-white/20 overflow-hidden mt-3">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-emerald-400 shadow-sm transition-all duration-1000 ease-out"
-                    style={{ width: `${Math.max(stats.persentasePartisipasi, 3)}%` }}
+                    className="h-full rounded-full bg-[#fbb017] transition-all duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(
+                        Math.max(stats.persentasePartisipasi, 2),
+                        100
+                      )}%`,
+                    }}
                   />
                 </div>
-
-                <div className="flex items-center justify-between text-[11px] text-blue-200/80 pt-1">
-                  <span>
-                    <strong className="text-white">{stats.totalSuaraMasuk}</strong> Suara Telah Masuk
-                  </span>
-                  <span>
-                    <strong className="text-white">{stats.totalBelumMemilih}</strong> Belum Memilih
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Footer Ticker */}
-              <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-blue-200/80">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-cyan-300" />
-                  Pemilihan dibuka s.d 16:00 WIB
-                </span>
-                <button
-                  onClick={onViewQuickCount}
-                  className="text-amber-300 hover:text-amber-200 font-semibold hover:underline flex items-center gap-1"
-                >
-                  Detail Suara &rarr;
-                </button>
               </div>
             </div>
           </div>
@@ -256,3 +154,4 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     </section>
   );
 };
+
