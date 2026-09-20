@@ -10,13 +10,15 @@ import {
   QrCode,
   Award,
   Sparkles,
+  Calendar,
 } from 'lucide-react';
-import { Candidate, User } from '../types';
-import { formatDateIndonesian } from '../lib/utils';
+import { Candidate, ElectionSettings, User } from '../types';
+import { formatDateIndonesian, formatElectionTimeRange, getElectionScheduleStatus } from '../lib/utils';
 
 interface VotingPageProps {
   candidates: Candidate[];
   currentUser: User | null;
+  settings?: ElectionSettings;
   onSelectCandidate: (candidate: Candidate) => void;
   onOpenLogin: () => void;
   onViewQuickCount: () => void;
@@ -26,12 +28,105 @@ interface VotingPageProps {
 export const VotingPage: React.FC<VotingPageProps> = ({
   candidates,
   currentUser,
+  settings,
   onSelectCandidate,
   onOpenLogin,
   onViewQuickCount,
   onViewReceipt,
 }) => {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+
+  const schedule = settings
+    ? getElectionScheduleStatus(settings.start_date, settings.end_date, settings.status)
+    : null;
+  const timeRangeFormatted = settings
+    ? formatElectionTimeRange(settings.start_date, settings.end_date)
+    : '';
+
+  // If election has not started yet
+  if (schedule?.status === 'upcoming' && currentUser?.role !== 'admin') {
+    return (
+      <div className="py-16 px-4 max-w-xl mx-auto text-center space-y-6 animate-fade-in">
+        <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center shadow-md">
+          <Clock className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 font-bold text-xs">
+            Bilik Suara Belum Dibuka
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+            Waktu Pemilihan Belum Dimulai
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mx-auto">
+            Bilik suara digital saat ini masih dalam tahap sosialisasi dan persiapan. Pemungutan suara akan dibuka sesuai jadwal resmi berikut:
+          </p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-left space-y-2 max-w-md mx-auto">
+          <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+            <Calendar className="w-4 h-4 text-amber-500" />
+            <span>Jadwal Rentang Waktu:</span>
+          </div>
+          <p className="text-sm font-mono font-bold text-slate-900 dark:text-white pl-6">
+            {timeRangeFormatted}
+          </p>
+          {schedule.timeRemaining && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold pl-6">
+              Akan dibuka dalam: <strong>{schedule.timeRemaining}</strong>
+            </p>
+          )}
+        </div>
+
+        <div className="flex justify-center gap-3 pt-2">
+          <button
+            onClick={onViewQuickCount}
+            className="px-6 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            Pantau Bilik Informasi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // If election is already closed or ended
+  if (schedule?.status === 'ended' && !currentUser?.sudah_memilih && currentUser?.role !== 'admin') {
+    return (
+      <div className="py-16 px-4 max-w-xl mx-auto text-center space-y-6 animate-fade-in">
+        <div className="w-16 h-16 rounded-2xl bg-red-100 dark:bg-red-950/70 text-red-600 dark:text-red-400 mx-auto flex items-center justify-center shadow-md">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <span className="px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/60 text-red-800 dark:text-red-300 font-bold text-xs">
+            Bilik Suara Ditutup
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+            Waktu Pemilihan Telah Berakhir
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mx-auto">
+            Batas rentang waktu pemungutan suara telah selesai. Kotak suara digital telah disegel secara otomatis.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-left space-y-2 max-w-md mx-auto">
+          <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+            <Calendar className="w-4 h-4 text-red-500" />
+            <span>Rentang Waktu Pelaksanaan:</span>
+          </div>
+          <p className="text-sm font-mono font-bold text-slate-900 dark:text-white pl-6">
+            {timeRangeFormatted}
+          </p>
+        </div>
+
+        <button
+          onClick={onViewQuickCount}
+          className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+        >
+          Lihat Hasil Rekapitulasi Suara
+        </button>
+      </div>
+    );
+  }
 
   // If not logged in
   if (!currentUser) {
@@ -151,6 +246,24 @@ export const VotingPage: React.FC<VotingPageProps> = ({
           Pilih salah satu pasangan calon di bawah ini kemudian klik konfirmasi.
         </p>
       </div>
+
+      {/* Rentang Waktu Pemilihan Banner */}
+      {timeRangeFormatted && (
+        <div className="max-w-2xl mx-auto p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+            <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+            <span>
+              <strong>Rentang Waktu:</strong> {timeRangeFormatted}
+            </span>
+          </div>
+          {schedule?.timeRemaining && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-[11px]">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Sisa Waktu: {schedule.timeRemaining}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 3 Candidates Voting Ballot Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

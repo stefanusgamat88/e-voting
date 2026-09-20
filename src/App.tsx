@@ -335,6 +335,7 @@ export default function App() {
           <VotingPage
             candidates={candidates}
             currentUser={currentUser}
+            settings={settings}
             onSelectCandidate={handleSelectCandidate}
             onOpenLogin={() => setShowLoginModal(true)}
             onViewQuickCount={() => setActiveTab('quickcount')}

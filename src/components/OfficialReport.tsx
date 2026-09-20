@@ -16,6 +16,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { Candidate, ElectionSettings, QuickCountStats, User, Vote } from '../types';
+import { formatElectionTimeRange } from '../lib/utils';
 
 interface OfficialReportProps {
   candidates: Candidate[];
@@ -87,6 +88,7 @@ Nomor: ${docNumber}
 Lembaga: ${schoolName}
 Penyelenggara: ${orgName}
 Hari/Tanggal: ${todayFormatted}
+Rentang Waktu Pemilihan: ${formatElectionTimeRange(settings.start_date, settings.end_date)}
 Tempat: ${meetingLocation}
 
 HASIL PEROLEHAN SUARA:
@@ -267,7 +269,7 @@ ${specialNotes}
               Pada hari ini <strong>{todayFormatted}</strong>, bertempat di <strong>{meetingLocation}</strong>, 
               Komisi Pemilihan Umum Organisasi Siswa Intra Sekolah ({orgName}) telah melaksanakan 
               <strong> Rapat Pleno Terbuka Rekapitulasi Hasil Pemungutan dan Penghitungan Suara </strong> 
-              Pemilihan Ketua dan Wakil Ketua OSIS {schoolName} {period}.
+              Pemilihan Ketua dan Wakil Ketua OSIS {schoolName} {period} yang diselenggarakan pada rentang waktu <strong>{formatElectionTimeRange(settings.start_date, settings.end_date)}</strong>.
             </p>
             <p>
               Rapat Pleno Terbuka ini dihadiri oleh Komisioner KPU OSIS, Panitia Pengawas Pemilihan, Saksi Pasangan Calon, 

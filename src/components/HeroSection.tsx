@@ -3,8 +3,11 @@ import {
   Sparkles,
   LogIn,
   TrendingUp,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 import { QuickCountStats, ElectionSettings, User } from '../types';
+import { formatElectionTimeRange, getElectionScheduleStatus } from '../lib/utils';
 
 interface HeroSectionProps {
   stats: QuickCountStats;
@@ -24,6 +27,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onStartVoting,
   onViewQuickCount,
 }) => {
+  const schedule = getElectionScheduleStatus(
+    settings.start_date,
+    settings.end_date,
+    settings.status
+  );
+  const timeRangeFormatted = formatElectionTimeRange(
+    settings.start_date,
+    settings.end_date
+  );
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-[#1d5ce5] via-[#2165f1] to-[#2563eb] text-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-12">
       <div className="relative max-w-7xl mx-auto">
@@ -89,12 +101,49 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <span className="text-sm font-semibold text-white/95">
                   Status Pemilihan
                 </span>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#16a34a] text-white text-xs font-bold tracking-wide shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                <div
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-white text-xs font-bold tracking-wide shadow-sm ${
+                    schedule.status === 'ongoing'
+                      ? 'bg-[#16a34a]'
+                      : schedule.status === 'upcoming'
+                      ? 'bg-amber-600'
+                      : 'bg-red-600'
+                  }`}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full bg-white ${
+                      schedule.status === 'ongoing' ? 'animate-pulse' : ''
+                    }`}
+                  />
                   <span>
-                    {(settings.status || 'Sedang Berlangsung').toUpperCase()}
+                    {schedule.status === 'ongoing'
+                      ? (settings.status || 'Sedang Berlangsung').toUpperCase()
+                      : schedule.status === 'upcoming'
+                      ? 'BELUM DIMULAI'
+                      : 'DITUTUP'}
                   </span>
                 </div>
+              </div>
+
+              {/* Rentang Waktu Pemilihan Card */}
+              <div className="mt-3 p-3 rounded-2xl bg-white/10 border border-white/15 space-y-1.5 text-xs">
+                <div className="flex items-center gap-1.5 text-blue-100/90 font-medium">
+                  <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="font-semibold text-white">Rentang Waktu Pemilihan:</span>
+                </div>
+                <p className="text-white font-mono text-[11px] sm:text-xs pl-5 font-semibold">
+                  {timeRangeFormatted}
+                </p>
+                {schedule.timeRemaining && (
+                  <div className="flex items-center gap-1.5 pt-1 pl-5 text-[11px] text-amber-300 font-bold">
+                    <Clock className="w-3 h-3 animate-spin-slow shrink-0" />
+                    <span>
+                      {schedule.status === 'ongoing'
+                        ? `Sisa Waktu: ${schedule.timeRemaining}`
+                        : `Mulai dalam: ${schedule.timeRemaining}`}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* 2-Column Grid: Total Paslon & Hak Pilih DPT */}
