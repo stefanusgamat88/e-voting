@@ -139,6 +139,102 @@ export function getElectionScheduleStatus(
   };
 }
 
+export interface CountdownTime {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  totalSeconds: number;
+  isExpired: boolean;
+  status: 'upcoming' | 'ongoing' | 'ended';
+  percentageElapsed: number; // 0 to 100
+  title: string;
+}
+
+export function calculateElectionCountdown(
+  startDate?: string,
+  endDate?: string,
+  manualStatus?: string
+): CountdownTime {
+  const now = Date.now();
+  const start = startDate ? new Date(startDate).getTime() : null;
+  const end = endDate ? new Date(endDate).getTime() : null;
+
+  if (manualStatus === 'Ditutup' || (end && !isNaN(end) && now >= end)) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      totalSeconds: 0,
+      isExpired: true,
+      status: 'ended',
+      percentageElapsed: 100,
+      title: 'Pemilihan Telah Ditutup',
+    };
+  }
+
+  if (manualStatus === 'Belum Dimulai' || (start && !isNaN(start) && now < start)) {
+    const diff = Math.max(0, (start || now) - now);
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return {
+      days,
+      hours,
+      minutes,
+      seconds,
+      totalSeconds,
+      isExpired: false,
+      status: 'upcoming',
+      percentageElapsed: 0,
+      title: 'Menuju Pembukaan Bilik Suara',
+    };
+  }
+
+  if (end && !isNaN(end) && now < end) {
+    const diff = Math.max(0, end - now);
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    let percentageElapsed = 0;
+    if (start && !isNaN(start) && end > start) {
+      const total = end - start;
+      const elapsed = now - start;
+      percentageElapsed = Math.min(100, Math.max(0, (elapsed / total) * 100));
+    }
+
+    return {
+      days,
+      hours,
+      minutes,
+      seconds,
+      totalSeconds,
+      isExpired: false,
+      status: 'ongoing',
+      percentageElapsed,
+      title: 'Sisa Waktu Menuju Penutupan Bilik Suara',
+    };
+  }
+
+  return {
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    totalSeconds: 0,
+    isExpired: false,
+    status: 'ongoing',
+    percentageElapsed: 0,
+    title: 'Pemilihan Sedang Berlangsung',
+  };
+}
+
 export function exportToCSV(filename: string, rows: Record<string, any>[]) {
   if (!rows || !rows.length) return;
   const separator = ',';

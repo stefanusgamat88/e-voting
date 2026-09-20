@@ -5,8 +5,8 @@ export const INITIAL_SETTINGS: ElectionSettings = {
   school_name: 'SMA NEGERI 1 TELADAN',
   period: 'Periode 2026/2027',
   status: 'Sedang Berlangsung',
-  start_date: '2026-09-12T07:00:00',
-  end_date: '2026-09-13T16:00:00',
+  start_date: '2026-09-20T07:00:00',
+  end_date: '2026-09-21T16:00:00',
   allow_geolocation: true,
   school_coordinates: {
     lat: -6.2088,

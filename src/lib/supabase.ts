@@ -120,9 +120,12 @@ export function getLocalData() {
   try {
     const rawSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
     const parsed = rawSettings ? JSON.parse(rawSettings) : INITIAL_SETTINGS;
+    const isOldPastMock = parsed.end_date === '2026-09-13T16:00:00';
     settings = {
       ...INITIAL_SETTINGS,
       ...parsed,
+      start_date: isOldPastMock || !parsed.start_date ? INITIAL_SETTINGS.start_date : parsed.start_date,
+      end_date: isOldPastMock || !parsed.end_date ? INITIAL_SETTINGS.end_date : parsed.end_date,
       school_logo_left: parsed.school_logo_left || parsed.school_logo || INITIAL_SETTINGS.school_logo_left,
       school_logo_right: parsed.school_logo_right || INITIAL_SETTINGS.school_logo_right,
     };

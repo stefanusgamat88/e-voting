@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
   LogIn,
   TrendingUp,
   Calendar,
   Clock,
+  Timer,
+  Hourglass,
+  AlertCircle,
 } from 'lucide-react';
 import { QuickCountStats, ElectionSettings, User } from '../types';
-import { formatElectionTimeRange, getElectionScheduleStatus } from '../lib/utils';
+import {
+  formatElectionTimeRange,
+  getElectionScheduleStatus,
+  calculateElectionCountdown,
+  CountdownTime,
+} from '../lib/utils';
 
 interface HeroSectionProps {
   stats: QuickCountStats;
@@ -36,6 +44,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     settings.start_date,
     settings.end_date
   );
+
+  // Dynamic live countdown state updated every second
+  const [countdown, setCountdown] = useState<CountdownTime>(() =>
+    calculateElectionCountdown(settings.start_date, settings.end_date, settings.status)
+  );
+
+  useEffect(() => {
+    // Initial calculation
+    setCountdown(
+      calculateElectionCountdown(settings.start_date, settings.end_date, settings.status)
+    );
+
+    const interval = setInterval(() => {
+      setCountdown(
+        calculateElectionCountdown(settings.start_date, settings.end_date, settings.status)
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [settings.start_date, settings.end_date, settings.status]);
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-[#1d5ce5] via-[#2165f1] to-[#2563eb] text-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-12">
       <div className="relative max-w-7xl mx-auto">
@@ -88,9 +117,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <span>Lihat Quick Count</span>
               </button>
             </div>
+
+            {/* Mobile / Compact Quick Countdown Status Banner */}
+            {countdown.status === 'ongoing' && (
+              <div className="pt-1 flex items-center gap-2 text-xs">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white shadow-sm">
+                  <Timer className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                  <span className="text-blue-100 font-medium">Sisa Waktu Memilih:</span>
+                  <span className="font-mono font-bold text-amber-300">
+                    {countdown.days > 0 ? `${countdown.days}h ` : ''}
+                    {String(countdown.hours).padStart(2, '0')}:
+                    {String(countdown.minutes).padStart(2, '0')}:
+                    {String(countdown.seconds).padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Right Column: Clean Status Card */}
+          {/* Right Column: Clean Status Card with Countdown Timer */}
           <div className="lg:col-span-5">
             <div
               id="hero-status-card"
@@ -134,20 +179,125 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <p className="text-white font-mono text-[11px] sm:text-xs pl-5 font-semibold">
                   {timeRangeFormatted}
                 </p>
-                {schedule.timeRemaining && (
-                  <div className="flex items-center gap-1.5 pt-1 pl-5 text-[11px] text-amber-300 font-bold">
-                    <Clock className="w-3 h-3 animate-spin-slow shrink-0" />
-                    <span>
-                      {schedule.status === 'ongoing'
-                        ? `Sisa Waktu: ${schedule.timeRemaining}`
-                        : `Mulai dalam: ${schedule.timeRemaining}`}
+              </div>
+
+              {/* DYNAMIC COUNTDOWN TIMER VISUALIZATION */}
+              <div
+                id="hero-countdown-timer-box"
+                className="mt-4 p-4 rounded-2xl bg-slate-950/30 backdrop-blur-md border border-white/20 shadow-inner space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-white">
+                    <Timer
+                      className={`w-4 h-4 text-amber-400 ${
+                        countdown.status === 'ongoing' ? 'animate-spin-slow' : ''
+                      }`}
+                    />
+                    <span className="tracking-wide uppercase text-[11px] font-black text-amber-300">
+                      {countdown.title}
                     </span>
                   </div>
+                  {countdown.status === 'ongoing' ? (
+                    <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-[10px] font-black tracking-wider">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                      LIVE
+                    </span>
+                  ) : countdown.status === 'upcoming' ? (
+                    <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/40 text-amber-300 text-[10px] font-black tracking-wider">
+                      AKAN DATANG
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/25 border border-red-400/40 text-red-300 text-[10px] font-black tracking-wider">
+                      DITUTUP
+                    </span>
+                  )}
+                </div>
+
+                {countdown.status === 'ended' ? (
+                  <div className="py-2.5 px-3 rounded-xl bg-red-950/40 border border-red-500/30 text-center space-y-1">
+                    <div className="flex items-center justify-center gap-1.5 text-red-300 font-bold text-xs">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>Pemungutan Suara Resmi Berakhir</span>
+                    </div>
+                    <p className="text-[11px] text-blue-100/80">
+                      Bilik suara digital telah disegel. Silakan pantau rekapitulasi perolehan suara.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* 4 Digit Tiles: Hari, Jam, Menit, Detik */}
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                      {/* Hari */}
+                      <div className="bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl py-2 px-1 flex flex-col items-center transition-colors">
+                        <span className="font-mono text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-md">
+                          {String(countdown.days).padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] font-extrabold tracking-wider text-blue-200/90 uppercase mt-0.5">
+                          Hari
+                        </span>
+                      </div>
+
+                      {/* Jam */}
+                      <div className="bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl py-2 px-1 flex flex-col items-center transition-colors">
+                        <span className="font-mono text-2xl sm:text-3xl font-black text-amber-300 tracking-tight drop-shadow-md">
+                          {String(countdown.hours).padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] font-extrabold tracking-wider text-blue-200/90 uppercase mt-0.5">
+                          Jam
+                        </span>
+                      </div>
+
+                      {/* Menit */}
+                      <div className="bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl py-2 px-1 flex flex-col items-center transition-colors">
+                        <span className="font-mono text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-md">
+                          {String(countdown.minutes).padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] font-extrabold tracking-wider text-blue-200/90 uppercase mt-0.5">
+                          Menit
+                        </span>
+                      </div>
+
+                      {/* Detik (Pulsing live counter) */}
+                      <div className="bg-amber-400/20 hover:bg-amber-400/25 border border-amber-300/40 rounded-xl py-2 px-1 flex flex-col items-center transition-colors relative overflow-hidden">
+                        <span className="font-mono text-2xl sm:text-3xl font-black text-amber-300 tracking-tight drop-shadow-md">
+                          {String(countdown.seconds).padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] font-black tracking-wider text-amber-200 uppercase mt-0.5">
+                          Detik
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar of Election Window */}
+                    {countdown.status === 'ongoing' && (
+                      <div className="space-y-1.5 pt-1">
+                        <div className="flex justify-between items-center text-[10px] text-blue-100/90 font-semibold">
+                          <span className="flex items-center gap-1">
+                            <Hourglass className="w-3 h-3 text-amber-300" />
+                            <span>Durasi Waktu Berjalan</span>
+                          </span>
+                          <span className="font-mono font-bold text-amber-300">
+                            {countdown.percentageElapsed > 0
+                              ? `${countdown.percentageElapsed.toFixed(0)}% Selesai`
+                              : 'Baru Dimulai'}
+                          </span>
+                        </div>
+                        <div className="w-full h-1.5 rounded-full bg-white/20 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 transition-all duration-700 ease-out"
+                            style={{
+                              width: `${Math.min(100, Math.max(3, countdown.percentageElapsed))}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
               {/* 2-Column Grid: Total Paslon & Hak Pilih DPT */}
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-5 mb-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-4 mb-4">
                 {/* Total Paslon */}
                 <div className="rounded-2xl bg-white/10 p-4 border border-white/10">
                   <p className="text-xs text-blue-100/80 font-medium">
