@@ -191,7 +191,17 @@ export const QuickCount: React.FC<QuickCountProps> = ({
           Perolehan Suara Pasangan Calon
         </h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div
+          className={`grid gap-6 justify-center mx-auto ${
+            stats.candidateStats.length === 1
+              ? 'grid-cols-1 max-w-md'
+              : stats.candidateStats.length === 2
+              ? 'grid-cols-1 md:grid-cols-2 max-w-4xl'
+              : stats.candidateStats.length === 4
+              ? 'grid-cols-1 md:grid-cols-2 max-w-5xl'
+              : 'grid-cols-1 lg:grid-cols-3 max-w-7xl'
+          }`}
+        >
           {stats.candidateStats.map((item) => {
             const { candidate, voteCount, percentage, isLeading } = item;
             const nomorFormatted = candidate.nomor_urut < 10 ? `0${candidate.nomor_urut}` : candidate.nomor_urut;

@@ -42,8 +42,18 @@ export const CandidatesSection: React.FC<CandidatesSectionProps> = ({
         )}
       </div>
 
-      {/* 3 Candidates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Candidates Grid - Centered dynamically */}
+      <div
+        className={`grid gap-8 justify-center mx-auto ${
+          sortedCandidates.length === 1
+            ? 'grid-cols-1 max-w-md'
+            : sortedCandidates.length === 2
+            ? 'grid-cols-1 md:grid-cols-2 max-w-4xl'
+            : sortedCandidates.length === 4
+            ? 'grid-cols-1 md:grid-cols-2 max-w-5xl'
+            : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl'
+        }`}
+      >
         {sortedCandidates.map((candidate) => (
           <CandidateCard
             key={candidate.id}

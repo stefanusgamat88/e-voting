@@ -265,8 +265,18 @@ export const VotingPage: React.FC<VotingPageProps> = ({
         </div>
       )}
 
-      {/* 3 Candidates Voting Ballot Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Candidates Voting Ballot Cards - Centered dynamically */}
+      <div
+        className={`grid gap-6 justify-center mx-auto ${
+          sortedCandidates.length === 1
+            ? 'grid-cols-1 max-w-md'
+            : sortedCandidates.length === 2
+            ? 'grid-cols-1 md:grid-cols-2 max-w-4xl'
+            : sortedCandidates.length === 4
+            ? 'grid-cols-1 md:grid-cols-2 max-w-5xl'
+            : 'grid-cols-1 md:grid-cols-3 max-w-7xl'
+        }`}
+      >
         {sortedCandidates.map((candidate) => {
           const isSelected = selectedCandidateId === candidate.id;
           const nomorFormatted = candidate.nomor_urut < 10 ? `0${candidate.nomor_urut}` : candidate.nomor_urut;
